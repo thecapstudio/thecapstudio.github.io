@@ -1,0 +1,2990 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAP Studio</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAMAAABiM0N1AAAAwFBMVEVHcExQpeYeZp1QpeYcY5keZp4cY5kcY5lQpeYcY5kcY5kcY5kcY5kcY5lQpeYcY5kcY5lQpeZQpeYcY5lMoeJQpeZJndxQpeZQpeYcY5kpLzMpLzMpLzMnND5QpeZQpeYre7kcY5khUHQpLzMpLzMpLzMre7kre7k2hMAxfbgpLzMpLzMgU3odYJIcY5lQpeYpLzMuerU1g789js0pdKwfZ543h8QkbaVDldMiTGsdX5BLn95GmdgnMzsfVoAkQ1k+Bv6KAAAALnRSTlMAn4DvvxDvQBBgIN/Pn4CPMLxAUM/fUCBgrxDvqjAwcJ9wr7/PQN/vv+/fgM/vDsx1IAAAAgVJREFUeF7t1GlvolAUxvEjiwiiYl3q1uk++zyXzd12vv+3GtK0DPZe5HJMJpmkv5e++OfhQKR/6MMH++ZL9Nmw6SyXF93uMEmS1eqG+MaNkfhr2Ji0WFu6ppD0J1RTqyHUzG6tWdemKDUa68/pi5O+eqTlkykqfBuQhgtTVIoMqjQWOtYd1nPJNqgotUyhJ6ooDYWmDXBL5bpC2xJwqMyl0JcCbZtK9IW+GCg904WoYYWMwxkkXxvweYPkEFxSaDBCbZK1RD0om3TNClkkGbJC8OQn44V69M6EF5LP3eCF5GcbcUOudCJmqMP7rHMHvPJ5/0S5Dd5It+aGbCrq80OO8qXtNy8OosqqJJRtjaMUBcs0ijd7USZWh5xoCaV1tDrUCNlNnLCMEnlZqgxNUUVqrVUhFzrSRBRAEfKa0LOM81l7VchCTntWoggNUMv6ZVaMnC2/sRpPmCJHr3pgiCCFApzJUl6aHxqAbfe03QEw6EUbbL/DMEvBzb9ppl2YyVLBuYPuFvfz+f3i8dxBTZsKfGSet3fO26/BwLCgxaCCANhtn8KHGR1xeu2ag3p4fgrD7zOSBFUtg4qsbXb3+RUpDabag+hXtuch70g8o4kSLh35GYaLGZ3i+lDx6djVj0eq4liQOcQRdPBOj5i845RFfHbh7r5NDPLdLZvO5d12rKlL/4E/J+b9aDyfawkAAAAASUVORK5CYII=" type="image/png">
+ <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            background: #000;
+            -webkit-font-smoothing: antialiased;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            transform: translate3d(0, 0, 0);
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            color: #fff;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        /* Fixed logo - always on top */
+        .fixed-logo {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            font-size: 60px;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            z-index: 10001;
+            cursor: default;
+            color: #fff;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        .fixed-logo.holding {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Header navigation */
+        .header-nav {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            z-index: 10001;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .nav-link {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            pointer-events: all;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            color: #fff;
+        }
+
+        /* Invisible mask zone - solid black, no blur */
+        .mask-zone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            z-index: 10000;
+            pointer-events: none;
+            background: linear-gradient(to bottom, 
+                #000 0%, 
+                #000 60%, 
+                rgba(0,0,0,0.9) 80%, 
+                transparent 100%);
+        }
+
+        /* Container */
+        .perspective-wrapper {
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .scene {
+            width: 100%;
+            position: relative;
+        }
+
+        /* Distortion background */
+        #distortionCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            filter: blur(80px);
+            opacity: 0.6;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 100vw;
+        }
+
+        /* Hero - no  container */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+            padding: 250px 30px 100px 80px;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+        }
+
+        .motto {
+            font-size: clamp(32px, 5vw, 80px);
+            font-weight: 300;
+            line-height: 1.4;
+            letter-spacing: -0.02em;
+            text-align: left;
+            color: #fff;
+        }
+
+        .motto .highlight {
+            font-weight: 700;
+            font-style: italic;
+        }
+
+        /* Services divider section */
+        .services-divider {
+            padding: 150px 30px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+        }
+
+        .services-container {
+            max-width: 1600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .services {
+            font-size: clamp(20px, 2.5vw, 40px);
+            line-height: 2.5;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Content section */
+        .content-section {
+            padding: 200px 30px;
+            position: relative;
+        }
+
+        .content-box {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0;
+            background: transparent;
+            backdrop-filter: none;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .content-box p {
+            font-size: clamp(18px, 2.3vw, 34px);
+            line-height: 1.95;
+            margin-bottom: 40px;
+            font-weight: 500;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            letter-spacing: 0.3px;
+            color: #fff;
+            text-align: left;
+            font-family: 'Space Grotesk', sans-serif;
+            position: relative;
+        }
+
+        .content-box p:first-child {
+            font-weight: 700;
+            font-size: clamp(32px, 5.5vw, 72px);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 60px;
+            color: #fff;
+            background: linear-gradient(45deg, #fff 0%, #fff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .content-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Multi-row marquee contact */
+        .contact-section {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .marquee-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .marquee-row {
+            display: flex;
+            overflow: hidden;
+        }
+
+        .marquee-track {
+            display: flex;
+            animation: marqueeScroll 30s linear infinite;
+            will-change: transform;
+        }
+
+        .marquee-row:nth-child(2) .marquee-track {
+            animation-direction: reverse;
+            animation-duration: 35s;
+        }
+
+        .marquee-row:nth-child(3) .marquee-track {
+            animation-duration: 25s;
+        }
+
+        .marquee-item {
+            font-size: clamp(40px, 6vw, 110px);
+            font-weight: 900;
+            padding: 0 100px;
+            white-space: nowrap;
+            background: linear-gradient(90deg, #ff0080, #ff8c00, #40e0d0, #9d00ff, #ff0080);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 5s linear infinite;
+            letter-spacing: -0.03em;
+            text-transform: lowercase;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .marquee-item:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes marqueeScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes gradientFlow {
+            to { background-position: 200% center; }
+        }
+
+        /* Footer - transparent */
+        .footer {
+            padding: 0px 0px 40px;
+            position: relative;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            max-width: 1600px;
+            margin: 0 auto 40px;
+            flex-wrap: wrap;
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .social-icon svg {
+            width: 24px;
+            height: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .social-icon:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px) scale(1.1);
+        }
+
+        .social-icon:hover svg {
+            transform: scale(1.2);
+        }
+
+        .copyright {
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 5px;
+            opacity: 0.3;
+        }
+
+        .service-item {
+            display: inline;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            position: relative;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .service-item::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #ff0080, #40e0d0);
+            transition: width 0.3s ease;
+        }
+
+        .service-item:hover::after {
+            width: 100%;
+        }
+
+        .service-item:hover {
+            color: #fff;
+        }
+
+        .service-description {
+            display: none;
+            font-size: clamp(16px, 1.8vw, 28px);
+            line-height: 1.85;
+            color: #fff;
+            font-style: normal;
+            margin: 20px auto;
+            padding: 0;
+            max-width: 950px;
+            background: transparent;
+            border-radius: 0;
+            border: none;
+            font-weight: 400;
+            letter-spacing: 0.4px;
+            text-transform: none;
+            position: relative;
+            backdrop-filter: none;
+            font-family: 'Space Grotesk', sans-serif;
+            box-shadow: none;
+            will-change: transform, opacity, filter;
+            animation: glitchReveal 0.6s cubic-bezier(0.6, 0.04, 0.98, 0.34) forwards;
+            overflow: hidden;
+        }
+
+        .service-description::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .service-description::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(255, 0, 128, 0.02),
+                rgba(255, 0, 128, 0.02) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            animation: scanlines 0.15s linear infinite;
+            z-index: 2;
+        }
+
+        .service-description.active {
+            display: block;
+        }
+
+        @keyframes glitchReveal {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px) skewX(-20deg) scaleX(0);
+                filter: blur(20px);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translateX(0) skewX(-5deg) scaleX(1.05);
+                filter: blur(0px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) skewX(0) scaleX(1);
+                filter: blur(0px);
+            }
+        }
+
+        @keyframes scanLine {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        @keyframes scanlines {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(10px);
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .fixed-logo {
+                font-size: 40px;
+                top: 20px;
+                left: 20px;
+            }
+
+            .header-nav {
+                gap: 15px;
+                right: 20px;
+                top: 30px;
+            }
+
+            .nav-link {
+                font-size: 11px;
+                letter-spacing: 0.5px;
+            }
+
+            .mask-zone {
+                height: 100px;
+            }
+
+            .hero {
+                padding: 120px 20px 60px 30px;
+            }
+
+            .services-divider {
+                padding: 100px 20px;
+            }
+
+            .content-box {
+                padding: 60px 40px;
+            }
+
+            .marquee-item {
+                padding: 0 30px;
+            }
+
+            .social-icons {
+                gap: 20px;
+            }
+
+            .social-icon {
+                width: 40px;
+                height: 40px;
+            }
+
+            .social-icon svg {
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mask-zone"></div>
+    <div class="fixed-logo" id="logo">CAP</div>
+    <nav class="header-nav">
+        <a class="nav-link" onclick="scrollToSection('about')">About</a>
+        <a class="nav-link" onclick="scrollToSection('services')">Services</a>
+        <a class="nav-link" onclick="scrollToSection('contact')">Contact</a>
+    </nav>
+
+    <canvas id="distortionCanvas"></canvas>
+    <canvas id="gameCanvas" style="display: none; position: fixed; top: 0; left: 0; z-index: 9999;"></canvas>
+    <div id="blackjackGame" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; background: linear-gradient(135deg, #0a4d2e 0%, #0f1f1f 50%, #0a4d2e 100%); overflow: auto; font-family: 'Trebuchet MS', sans-serif;">
+        <style>
+            .bj-card {
+                width: 70px;
+                height: 105px;
+                background: white;
+                border: 2px solid #333;
+                border-radius: 8px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 32px;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.1);
+                position: relative;
+                transition: transform 0.3s ease;
+            }
+            .bj-card:hover {
+                transform: translateY(-5px);
+            }
+            .bj-card-rank {
+                position: absolute;
+                top: 4px;
+                left: 4px;
+                font-size: 12px;
+                line-height: 1;
+            }
+            .bj-card-rank-bottom {
+                position: absolute;
+                bottom: 4px;
+                right: 4px;
+                font-size: 12px;
+                line-height: 1;
+                transform: rotate(180deg);
+            }
+            .bj-card.red {
+                color: #d32f2f;
+            }
+            .bj-card.black {
+                color: #000;
+            }
+            .bj-card-back {
+                width: 70px;
+                height: 105px;
+                background: linear-gradient(135deg, #1a3d2a 0%, #0d2818 100%);
+                border: 2px solid #ffd700;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.5), 0 0 20px rgba(255,215,0,0.2);
+                color: #ffd700;
+                font-size: 36px;
+                font-weight: bold;
+            }
+        </style>
+        <div id="blackjackContainer" style="min-height: 100vh; display: flex; flex-direction: column; padding: 30px; max-width: 1800px; margin: 0 auto;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 15px 25px; background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(15,31,31,0.8)); border-radius: 12px; border: 2px solid #2d9d6a; box-shadow: 0 0 30px rgba(45,157,106,0.3);">
+                <button onclick="prayForMoney()" title="Pray" style="background: none; border: none; font-size: 28px; cursor: pointer; padding: 8px; transition: transform 0.2s; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">🙏</button>
+                <div style="text-align: center; flex: 1;">
+                    <div style="color: #ffd700; font-size: 24px; font-weight: bold; text-shadow: 0 0 10px rgba(255,215,0,0.5);">💰 $ <span id="balanceDisplay">10000</span></div>
+                </div>
+                <button onclick="closeBlackjack()" style="background: linear-gradient(135deg, #d32f2f, #b71c1c); color: white; border: none; padding: 10px 25px; font-size: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(211,47,47,0.5);">EXIT</button>
+            </div>
+
+            <!-- Dealer Section -->
+            <div style="margin-bottom: 30px; padding: 20px; background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(15,31,31,0.5)); border-radius: 12px; border: 2px solid #2d9d6a;">
+                <div style="color: #2d9d6a; font-size: 16px; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px;">DEALER</div>
+                <div id="dealerHand" style="display: flex; gap: 15px; min-height: 110px; align-items: center; padding: 15px; justify-content: center;"></div>
+                <div id="dealerValue" style="color: #ffd700; font-size: 15px; margin-top: 10px; text-align: center; font-weight: bold; letter-spacing: 1px;"></div>
+            </div>
+
+            <!-- Player Hands Section -->
+            <div style="margin-bottom: 30px;">
+                <div style="color: #2d9d6a; font-size: 16px; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px;">YOUR HANDS</div>
+                <div id="handsGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                    <!-- Hands will be inserted here dynamically -->
+                </div>
+            </div>
+
+            <!-- Betting Section -->
+            <div id="bettingSection" style="display: none; padding: 20px; background: linear-gradient(135deg, rgba(0,0,0,0.5), rgba(15,31,31,0.5)); border-radius: 12px; border: 2px solid #2d9d6a; margin-bottom: 30px;">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                    <div style="color: #2d9d6a; font-size: 16px; font-weight: bold; letter-spacing: 1px;">PLACE YOUR BETS</div>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="rebetToggle" onchange="toggleRebetMode()" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span style="color: #2d9d6a; font-size: 13px; font-weight: bold; letter-spacing: 0.5px;">AUTO REBET</span>
+                    </label>
+                </div>
+                <div id="bettingControls" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px;">
+                    <!-- Betting controls will be inserted here -->
+                </div>
+
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="toggleAddHand()" id="addHandBtn" style="background: #00bcd4; color: #000; border: none; padding: 10px 18px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: all 0.3s; font-size: 14px;">+ ADD HAND</button>
+                    <button onclick="startGame()" style="background: linear-gradient(135deg, #2d9d6a, #1b6e52); color: white; border: none; padding: 12px 35px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 0 20px rgba(45,157,106,0.5); transition: all 0.3s; letter-spacing: 1px;">DEAL ▶</button>
+                </div>
+            </div>
+
+            <!-- Message Area -->
+            <div id="message" style="color: #2d9d6a; text-align: center; font-size: 18px; font-weight: bold; margin-bottom: 20px; text-shadow: 0 0 10px rgba(45,157,106,0.5); min-height: 30px; letter-spacing: 1px;"></div>
+
+            <!-- Game Actions -->
+            <div id="gameActions" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;"></div>
+        </div>
+    </div>
+
+    <div class="perspective-wrapper">
+        <div class="scene" id="scene">
+            <div class="content">
+                <!-- Hero -->
+                <section class="hero">
+                    <div class="hero-content">
+                        <div class="motto">
+                            Find your world. Speak to your world. <span class="highlight">Make products to fill that world.</span> Virtually communicate to that world. Allow people to <span class="highlight">buy into the world you've built.</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Services divider -->
+                <section class="services-divider" id="services">
+                    <div class="services-container">
+                        <div class="services">
+                            <span class="service-item" data-service="atelier">Atelier</span>
+                            <div class="service-description" id="desc-atelier">For special creations, bespoke projects and true one-of-ones, we drive all parts of the process with respect and care.</div>
+                            • 
+                            <span class="service-item" data-service="brand">Brand Maturation</span>
+                            <div class="service-description" id="desc-brand">Identity and brand development thru a lifestyle lens. Assistance with creative direction & brand ideation; creating the world in which the project will live and understanding how it lives in the world.</div>
+                            • 
+                            <span class="service-item" data-service="development">Development</span>
+                            <div class="service-description" id="desc-development">From blank page to final execution without limits — CAD, prototyping, sourcing, embellishment, and relentless technical expertise. </div>
+                            • 
+                            <span class="service-item" data-service="production">Streamlined Production Management</span>
+                            <div class="service-description" id="desc-production">Production solutions and mental ease with superior and efficient production management. Sourcing and management of materials and multi-process blocks of production. Working with facilities in Europe, Asia, Mexico and The United States specifically allocating jobs based on product specifics, cost requirements and quantity.</div>
+                            • 
+                            <span class="service-item" data-service="strategy">Advanced Strategy</span>
+                            <div class="service-description" id="desc-strategy">Journey from an idea to reality starts with defined strategic and financial plans that provide qualitative and quantitative targets, ensuring sustained growth stays on course. Our team focuses strategy in overall business, financial oversight and merchandise planning, Further strategy in calendar(s), ethnographies, sales, web3, activations, and marketing. </div>
+                            • 
+                            <span class="service-item" data-service="collections">Collection Designs & Build</span>
+                            <div class="service-description" id="desc-collections">Guidance with collection design and outline; ghost designing and technical consulting to ensure an impactful product. </div>
+                            • 
+                            <span class="service-item" data-service="sales">Sales & Marketing Agenda</span>
+                            <div class="service-description" id="desc-sales">Defining placement goals; roadmapping the route. Understanding retail placement, fostering activations and specific alignments for both sales and marketing. Using marketing tools to empower the emotion, define communication and *PR* objectives, deploy brand tools effectively.  Content strategy, partnerships & collaborations.</div>
+                            • 
+                            <span class="service-item" data-service="bridge">Bridge-360</span>
+                            <div class="service-description" id="desc-bridge">An immersive 360 program utilizing all team capabilities; stringing a red lines thru all components of the project to ensure goals are reached. </div>
+                            • 
+                            <span class="service-item" data-service="contact">Contact</span>
+                            <div class="service-description" id="desc-contact">contact@capstudio.com</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Content -->
+                <section class="content-section" id="about">
+                    <div class="content-box">
+                        <p>CAP is a multidisciplinary international studio developing and implementing cross-cultural strategies with partners worldwide.</p>
+                        <p>As a 360° creative studio with a free-form approach allowing its clients to receive dedicated and tailor-made support, strategic direction and comprehensive assistance.</p>
+                        <p>Our global network forms the foundation for a strong understanding in counter culture approaches, providing clients with influence in personal brand building, aesthetics, development and production, sales strategies, event management, traditional press and media, content creation, social media marketing or the cultivation of visionary projects.</p>
+                    </div>
+                </section>
+
+                <!-- Contact marquee - 1 row -->
+                <section class="contact-section" id="contact">
+                    <div class="marquee-container">
+                        <div class="marquee-row">
+                            <div class="marquee-track">
+                                <div class="marquee-item" onclick="copyEmail()">contact@capstudio.com</div>
+                                <div class="marquee-item" onclick="copyEmail()">contact@capstudio.com</div>
+                                <div class="marquee-item" onclick="copyEmail()">contact@capstudio.com</div>
+                                <div class="marquee-item" onclick="copyEmail()">contact@capstudio.com</div>
+                                <div class="marquee-item" onclick="copyEmail()">contact@capstudio.com</div>
+                                <div class="marquee-item" onclick="copyEmail()">contact@capstudio.com</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="footer" id="socials">
+                    <div class="social-icons">
+    <a href="https://youtube.com" target="_blank" title="YouTube">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174883.png" alt="YouTube" width="48" height="48">
+    </a>
+    <a href="https://instagram.com" target="_blank" title="Instagram">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" alt="Instagram" width="48" height="48">
+    </a>
+    <a href="https://twitter.com" target="_blank" title="X (Twitter)">
+        <img src="https://cdn-icons-png.flaticon.com/512/5969/5969020.png" alt="X Twitter" width="48" height="48">
+    </a>
+    <a href="https://tiktok.com" target="_blank" title="TikTok">
+        <img src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png" alt="TikTok" width="48" height="48">
+    </a>
+                    </div>
+                    <div class="copyright">© 2024 CAP STUDIO</div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const isMobile = window.innerWidth < 768;
+
+        // Distortion background
+        const distCanvas = document.getElementById('distortionCanvas');
+        const distCtx = distCanvas.getContext('2d', { alpha: true, willReadFrequently: false });
+        distCtx.imageSmoothingEnabled = false;
+        distCanvas.width = window.innerWidth;
+        distCanvas.height = window.innerHeight;
+
+        const colors = ['#ff0080', '#ff8c00', '#40e0d0', '#9d00ff'];
+        let time = 0;
+
+        function drawDistortion() {
+            distCtx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+            distCtx.fillRect(0, 0, distCanvas.width, distCanvas.height);
+
+            for (let i = 0; i < 4; i++) {
+                const x = distCanvas.width / 2 + Math.sin(time + i) * 300;
+                const y = distCanvas.height / 2 + Math.cos(time + i * 1.3) * 200;
+                const gradient = distCtx.createRadialGradient(x, y, 0, x, y, 300);
+                gradient.addColorStop(0, colors[i] + '80');
+                gradient.addColorStop(1, 'transparent');
+                distCtx.fillStyle = gradient;
+                distCtx.beginPath();
+                distCtx.arc(x, y, 300, 0, Math.PI * 2);
+                distCtx.fill();
+            }
+
+            time += 0.01;
+            requestAnimationFrame(drawDistortion);
+        }
+        drawDistortion();
+
+        // Copy email function
+        function copyEmail() {
+            navigator.clipboard.writeText('contact@capstudio.com').then(() => {
+                alert('Email copied to clipboard!');
+            });
+        }
+
+        // Smooth scroll to sections
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                const offset = 220; // Offset to prevent header overlap
+                const top = element.offsetTop - offset;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        }
+
+        // Service item dropdowns
+        const serviceItems = document.querySelectorAll('.service-item');
+        serviceItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const service = item.getAttribute('data-service');
+                const desc = document.getElementById('desc-' + service);
+                
+                // Close all other descriptions
+                document.querySelectorAll('.service-description').forEach(d => {
+                    if (d !== desc) {
+                        d.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current description
+                desc.classList.toggle('active');
+            });
+        });
+
+        // Logo click
+        document.getElementById('logo').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Resize
+        window.addEventListener('resize', () => {
+            distCanvas.width = window.innerWidth;
+            distCanvas.height = window.innerHeight;
+        });
+
+        // ========== EASTER EGG: BREAKOUT GAME ==========
+        let gameActive = false;
+        let gameInitialized = false;
+        let isHoldingLogo = false;
+        let holdStartTime = null;
+        const holdDuration = 15000; // 15 seconds
+
+        // Game variables
+        let gameCanvas = document.getElementById('gameCanvas');
+        let gameCtx = gameCanvas.getContext('2d');
+        let gameRunning = false;
+        let mousePosX = 0;
+        let lastLifeLossTime = 0;
+        let showingFlash = false;
+
+        // Game objects
+        let paddle = {
+            x: 0,
+            y: 0,
+            width: 75,
+            height: 12,
+            baseWidth: 75
+        };
+
+        let balls = [];
+        let bricks = [];
+        let lives = 3;
+        let score = 0;
+        let level = 1;
+        let powerups = [];
+        let powerupFlashText = '';
+        let powerupFlashEndTime = 0;
+        let backgroundMusicOscillator = null;
+        let backgroundMusicGainNode = null;
+        let backgroundMusicContext = null;
+
+        const BRICK_ROW_COUNT = 4;
+        const BRICK_COLUMN_COUNT = 10;
+        let BRICK_WIDTH = 50;
+        let BRICK_HEIGHT = 12;
+        let BRICK_PADDING = 6;
+        const BRICK_OFFSET_TOP = 80;
+        // BRICK_OFFSET_LEFT will be calculated dynamically
+
+        // ========== LEVEL PROGRESSION SYSTEM ==========
+        // Level configs define brick layouts with durability and metal obstacles
+        const LEVEL_CONFIGS = {
+            1: {
+                description: 'Classic',
+                metalBricks: 0,
+                maxDurability: 1,
+                metalPattern: []
+            },
+            2: {
+                description: 'Reinforced',
+                metalBricks: 3,
+                maxDurability: 1,
+                metalPattern: [10, 20, 30] // Symmetric vertical pattern
+            },
+            3: {
+                description: 'Hardened',
+                metalBricks: 4,
+                maxDurability: 2,
+                metalPattern: [5, 14, 25, 34] // Symmetric diagonal pattern
+            },
+            4: {
+                description: 'Steel Fortress',
+                metalBricks: 6,
+                maxDurability: 2,
+                // Symmetric X pattern: corners and center cross
+                metalPattern: [0, 9, 10, 19, 20, 39]
+            },
+            5: {
+                description: 'Titanium',
+                metalBricks: 8,
+                maxDurability: 3,
+                // Symmetric checkerboard pattern on edges
+                metalPattern: [1, 8, 11, 18, 21, 28, 31, 38]
+            },
+            6: {
+                description: 'Obsidian',
+                metalBricks: 6,
+                maxDurability: 3,
+                // Symmetric plus/cross pattern
+                metalPattern: [4, 5, 14, 15, 24, 25, 34, 35]
+            },
+            7: {
+                description: 'Diamond',
+                metalBricks: 10,
+                maxDurability: 3,
+                // Dense symmetric pattern
+                metalPattern: [1, 8, 10, 11, 18, 19, 20, 21, 28, 29, 30, 31, 38, 39]
+            }
+        };
+
+        // Helper function to generate level config (scales beyond 7)
+        function getLevelConfig(levelNum) {
+            if (LEVEL_CONFIGS[levelNum]) return LEVEL_CONFIGS[levelNum];
+            
+            // Scale beyond level 7 - create symmetric patterns
+            const scaleFactor = levelNum - 6;
+            const metalCount = Math.min(12, 6 + scaleFactor);
+            
+            // Generate symmetric pattern based on level
+            const metalPattern = [];
+            const step = Math.floor(40 / (metalCount + 1));
+            
+            // Create symmetric pattern by placing bricks symmetrically
+            for (let i = 0; i < metalCount; i++) {
+                const pos = step * (i + 1);
+                if (pos < 40) metalPattern.push(pos);
+            }
+            
+            return {
+                description: `Level ${levelNum}`,
+                metalBricks: metalCount,
+                maxDurability: Math.min(3, 2 + Math.floor((scaleFactor) / 3)),
+                metalPattern: metalPattern
+            };
+        }
+
+        // Helper function to get brick durability value for a level
+        function getBrickDurability(levelNum) {
+            const maxDur = getLevelConfig(levelNum).maxDurability;
+            // Random durability: mostly 1-hit, some 2-hit, fewer 3-hit
+            const rand = Math.random();
+            if (rand < 0.6) return 1;
+            if (rand < 0.85) return Math.min(2, maxDur);
+            return Math.min(3, maxDur);
+        }
+
+        // ========== POWERUP RARITY CONFIGURATION ==========
+        // Adjust these values to change powerup drop rates
+        // Higher number = more common, Lower number = more rare
+        const POWERUP_RATES = {
+            'life': 8,           // +1 Life - Common
+            'ball': 6,           // +1 Ball - Common
+            'multi': 3,          // +3 Balls (Multi Ball) - Uncommon
+            'balls2': 4,         // +2 Balls - Uncommon
+            'long': 2,           // Long Paddle - Rare
+            'short': 2,          // Short Paddle - Rare
+            'slow': 5,           // Slow Mode - Uncommon
+            'fast': 2,           // Speed Up (Negative) - Rare
+            'mega': 0.5,         // +10 Balls (Mega Ball) - Super Rare
+            'bonus': 0.3         // +3 Lives (Mega Bonus) - Super Rare
+        };
+
+        const TOTAL_POWERUP_WEIGHT = Object.values(POWERUP_RATES).reduce((a, b) => a + b, 0);
+        const POWERUP_DROP_CHANCE = 0.15; // 15% chance to drop any powerup when brick is destroyed
+
+        function createBall(x, y, speedX, speedY) {
+            return {
+                x: x,
+                y: y,
+                radius: Math.max(4, Math.floor(BRICK_WIDTH * 0.08)), // 8% of brick width, min 4px
+                speedX: speedX,
+                speedY: speedY
+            };
+        }
+
+        // Function to select a powerup based on rarity weights
+        function selectPowerup() {
+            let rand = Math.random() * TOTAL_POWERUP_WEIGHT;
+            let cumulative = 0;
+            
+            for (const [powerupType, weight] of Object.entries(POWERUP_RATES)) {
+                cumulative += weight;
+                if (rand <= cumulative) {
+                    return powerupType;
+                }
+            }
+            
+            return 'life'; // Fallback
+        }
+
+        // Sound effect functions using Web Audio API
+        function playSound(frequency, duration, type = 'sine') {
+            try {
+                // Create fresh audio context for each sound (better mobile support)
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (e) {
+                // Audio context not supported - silent fail
+            }
+        }
+
+        function playPowerupSound() {
+            try {
+                playSound(800, 0.15, 'sine');
+                setTimeout(() => playSound(1000, 0.15, 'sine'), 100);
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function playLifeLossSound() {
+            try {
+                playSound(200, 0.3, 'sine');
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function playBallPaddleSound() {
+            try {
+                playSound(600, 0.1, 'square');
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function playBallBrickSound() {
+            try {
+                playSound(400, 0.08, 'sine');
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function playWallSound() {
+            try {
+                playSound(300, 0.06, 'sine');
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function playMetalBrickSound() {
+            try {
+                playSound(250, 0.1, 'square'); // Lower frequency, square wave for metallic sound
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function startBackgroundMusic() {
+            try {
+                // Stop existing music if any
+                if (backgroundMusicOscillator) {
+                    backgroundMusicOscillator.stop();
+                }
+                
+                backgroundMusicContext = new (window.AudioContext || window.webkitAudioContext)();
+                backgroundMusicOscillator = backgroundMusicContext.createOscillator();
+                backgroundMusicGainNode = backgroundMusicContext.createGain();
+                const lfo = backgroundMusicContext.createOscillator(); // Low frequency oscillator for modulation
+                const lfoGain = backgroundMusicContext.createGain();
+                
+                // Setup background tone (low, subtle)
+                backgroundMusicOscillator.type = 'sine';
+                backgroundMusicOscillator.frequency.value = 80; // Low bass tone
+                
+                // Setup LFO for subtle pitch variation (makes it less monotonous)
+                lfo.type = 'sine';
+                lfo.frequency.value = 0.5; // 0.5 Hz variation = slow, subtle changes
+                lfoGain.gain.value = 15; // Small pitch variation (15 Hz range)
+                
+                // Connect LFO to modulate the main frequency
+                lfo.connect(lfoGain);
+                lfoGain.connect(backgroundMusicOscillator.frequency);
+                
+                // Setup volume (very quiet, background level)
+                backgroundMusicGainNode.gain.value = 0.08; // 8% volume for background
+                
+                // Connect to output
+                backgroundMusicOscillator.connect(backgroundMusicGainNode);
+                backgroundMusicGainNode.connect(backgroundMusicContext.destination);
+                
+                // Start oscillators
+                backgroundMusicOscillator.start(backgroundMusicContext.currentTime);
+                lfo.start(backgroundMusicContext.currentTime);
+            } catch (e) {
+                // Silent fail if Web Audio not supported
+            }
+        }
+
+        function stopBackgroundMusic() {
+            try {
+                if (backgroundMusicOscillator && backgroundMusicContext) {
+                    backgroundMusicOscillator.stop(backgroundMusicContext.currentTime);
+                    backgroundMusicOscillator = null;
+                    backgroundMusicGainNode = null;
+                    backgroundMusicContext = null;
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function initializeGame() {
+            gameCanvas.width = window.innerWidth;
+            gameCanvas.height = window.innerHeight;
+
+            // Scale bricks based on available width - same calculation for mobile and desktop
+            const availableWidth = gameCanvas.width * 0.85; // Reduced from 95% to 85% for smaller desktop
+            const totalPaddingSpace = (BRICK_COLUMN_COUNT - 1) * 8; // Space taken by gaps
+            BRICK_WIDTH = Math.floor((availableWidth - totalPaddingSpace) / BRICK_COLUMN_COUNT);
+            BRICK_HEIGHT = Math.floor(BRICK_WIDTH * 0.3); // Height is 30% of width
+            BRICK_PADDING = 8; // Fixed 8px padding between bricks
+
+            // Calculate brick layout centered on screen
+            const totalBrickWidth = BRICK_COLUMN_COUNT * BRICK_WIDTH + (BRICK_COLUMN_COUNT - 1) * BRICK_PADDING;
+            const BRICK_OFFSET_LEFT = (gameCanvas.width - totalBrickWidth) / 2;
+
+            // Paddle scales with brick width
+            paddle.width = Math.max(60, BRICK_WIDTH * 1.5); // 1.5x brick width, min 60px
+            paddle.height = Math.floor(BRICK_HEIGHT * 0.8); // 80% of brick height
+            paddle.baseWidth = paddle.width;
+            paddle.x = gameCanvas.width / 2 - paddle.width / 2;
+            paddle.y = gameCanvas.height - 50;
+
+            balls = [createBall(gameCanvas.width / 2, gameCanvas.height - 60, 4, -4)];
+            bricks = [];
+            powerups = [];
+            powerupFlashText = '';
+            powerupFlashEndTime = 0;
+
+            // Get level configuration
+            const levelConfig = getLevelConfig(level);
+            
+            // Create symmetric durability patterns for multi-hit bricks
+            const durabilityPatterns = {
+                1: [],  // Level 1: All 1-hit
+                2: [],  // Level 2: All 1-hit
+                3: [5, 14, 25, 34],  // Level 3: 4 bricks with 2 hits (same as metal positions but for durability)
+                4: [2, 7, 12, 17, 22, 27, 32, 37],  // Level 4: 8 bricks with 2 hits (alternating pattern)
+                5: [1, 8, 11, 18, 21, 28, 31, 38],  // Level 5: First 8 with 2 hits, some with 3 hits
+                6: [0, 9, 10, 19, 20, 39],  // Level 6: Symmetric X pattern for 2-hit
+                7: [1, 3, 6, 8, 11, 13, 16, 18, 21, 23, 26, 28, 31, 33, 36, 38]  // Level 7: Dense 2-hit pattern
+            };
+
+            const twoHitPositions = durabilityPatterns[level] ? new Set(durabilityPatterns[level]) : new Set();
+            
+            // For levels beyond 7, create symmetric pattern
+            if (!durabilityPatterns[level] && level > 7) {
+                const scaleFactor = level - 6;
+                const spacing = Math.ceil(40 / (4 + scaleFactor));
+                for (let i = 0; i < 40; i += spacing) {
+                    twoHitPositions.add(i);
+                }
+            }
+
+            let brickIndex = 0;
+            const metalBrickPositions = new Set(levelConfig.metalPattern);
+            
+            // If no specific metal pattern defined, randomly distribute them
+            if (metalBrickPositions.size === 0 && levelConfig.metalBricks > 0) {
+                const totalBricks = BRICK_COLUMN_COUNT * BRICK_ROW_COUNT;
+                while (metalBrickPositions.size < levelConfig.metalBricks) {
+                    metalBrickPositions.add(Math.floor(Math.random() * totalBricks));
+                }
+            }
+
+            for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+                bricks[c] = [];
+                for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+                    const isMetal = metalBrickPositions.has(brickIndex);
+                    let durability;
+                    
+                    if (isMetal) {
+                        durability = 0; // Indestructible
+                    } else if (twoHitPositions.has(brickIndex)) {
+                        // Determine if this should be 2-hit or 3-hit
+                        durability = (level >= 5 && brickIndex % 3 === 0) ? 3 : 2;
+                    } else {
+                        durability = 1;
+                    }
+                    
+                    bricks[c][r] = {
+                        x: c * (BRICK_WIDTH + BRICK_PADDING) + BRICK_OFFSET_LEFT,
+                        y: r * (BRICK_HEIGHT + BRICK_PADDING) + 80,
+                        status: 1,
+                        durability: durability,      // How many hits needed (0 = indestructible)
+                        maxDurability: durability,   // Original durability for visual
+                        isMetal: isMetal             // True if this is an indestructible brick
+                    };
+                    brickIndex++;
+                }
+            }
+
+            gameRunning = true;
+            gameActive = true;
+            gameInitialized = true;
+            // startBackgroundMusic(); // Start background music when game starts
+        }
+
+        function drawGame() {
+            gameCtx.fillStyle = '#000';
+            gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+            // Draw red flash on life loss
+            if (showingFlash) {
+                gameCtx.fillStyle = 'rgba(255, 0, 0, 0.4)';
+                gameCtx.fillRect(0, 0, gameCanvas.width, gameCanvas.height);
+            }
+
+            // Draw powerup flash text
+            if (powerupFlashText && Date.now() < powerupFlashEndTime) {
+                gameCtx.fillStyle = 'rgba(255, 200, 0, 0.8)';
+                gameCtx.font = 'bold 48px Arial';
+                gameCtx.textAlign = 'center';
+                gameCtx.textBaseline = 'middle';
+                gameCtx.fillText(powerupFlashText, gameCanvas.width / 2, gameCanvas.height / 2);
+            }
+
+            // Draw bricks
+            for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+                for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+                    if (bricks[c][r].status === 1) {
+                        let brick = bricks[c][r];
+                        let brickX = brick.x;
+                        let brickY = brick.y;
+                        
+                        // Metal/indestructible bricks: gold with metallic effect
+                        if (brick.isMetal) {
+                            gameCtx.fillStyle = '#FFD700';
+                            gameCtx.fillRect(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
+                            // Metallic shine effect
+                            gameCtx.fillStyle = 'rgba(255, 255, 200, 0.5)';
+                            gameCtx.fillRect(brickX + 2, brickY + 1, BRICK_WIDTH - 4, 2);
+                        } else {
+                            // Regular bricks: grayscale based on durability
+                            // 1-hit: light grey (#cccccc)
+                            // 2-hit: medium grey (#888888)
+                            // 3-hit: dark grey (#444444)
+                            let greyValue;
+                            if (brick.durability === 1) {
+                                greyValue = '#cccccc'; // Light grey for 1-hit
+                            } else if (brick.durability === 2) {
+                                greyValue = '#888888'; // Medium grey for 2-hit
+                            } else {
+                                greyValue = '#444444'; // Dark grey for 3-hit
+                            }
+                            
+                            gameCtx.fillStyle = greyValue;
+                            gameCtx.fillRect(brickX, brickY, BRICK_WIDTH, BRICK_HEIGHT);
+                        }
+                    }
+                }
+            }
+
+            // Draw paddle
+            gameCtx.fillStyle = '#fff';
+            gameCtx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+
+            // Draw balls
+            gameCtx.fillStyle = '#ff0080';
+            for (let ball of balls) {
+                gameCtx.beginPath();
+                gameCtx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                gameCtx.fill();
+            }
+
+            // Draw powerups (mystery gift box)
+            gameCtx.font = `bold ${Math.floor(BRICK_WIDTH * 0.5)}px Arial`;
+            gameCtx.textAlign = 'center';
+            gameCtx.textBaseline = 'middle';
+            for (let p of powerups) {
+                gameCtx.fillText('🎁', p.x + BRICK_WIDTH / 2, p.y + BRICK_HEIGHT / 2);
+            }
+
+            // Draw UI centered at top: Level, Score, Lives
+            gameCtx.fillStyle = '#fff';
+            gameCtx.font = 'bold 20px Arial';
+            gameCtx.textAlign = 'center';
+            gameCtx.textBaseline = 'top';
+            const uiText = `Level: ${level}  •  Score: ${score}  •  Lives: ${lives}`;
+            gameCtx.fillText(uiText, gameCanvas.width / 2, 20);
+        }
+
+        function updateGame() {
+            // Update paddle position (follow mouse)
+            paddle.x = Math.max(0, Math.min(mousePosX - paddle.width / 2, gameCanvas.width - paddle.width));
+
+            // Update all balls
+            for (let ballIdx = balls.length - 1; ballIdx >= 0; ballIdx--) {
+                let ball = balls[ballIdx];
+                ball.x += ball.speedX;
+                ball.y += ball.speedY;
+
+                // Ball collision with walls
+                if (ball.x - ball.radius < 0 || ball.x + ball.radius > gameCanvas.width) {
+                    ball.speedX = -ball.speedX;
+                    ball.x = ball.x - ball.radius < 0 ? ball.radius : gameCanvas.width - ball.radius;
+                    playWallSound();
+                }
+                if (ball.y - ball.radius < 0) {
+                    ball.speedY = -ball.speedY;
+                    playWallSound();
+                }
+
+                // Ball collision with paddle
+                if (ball.y + ball.radius > paddle.y &&
+                    ball.y - ball.radius < paddle.y + paddle.height &&
+                    ball.x > paddle.x &&
+                    ball.x < paddle.x + paddle.width) {
+                    ball.speedY = -Math.abs(ball.speedY);
+                    ball.y = paddle.y - ball.radius;
+                    playBallPaddleSound();
+                }
+
+                // Ball collision with bricks
+                for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+                    for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+                        let brick = bricks[c][r];
+                        if (brick.status === 1) {
+                            if (ball.x > brick.x && ball.x < brick.x + BRICK_WIDTH &&
+                                ball.y > brick.y && ball.y < brick.y + BRICK_HEIGHT) {
+                                
+                                // Handle metal/indestructible bricks - just bounce
+                                if (brick.isMetal) {
+                                    ball.speedY = -ball.speedY;
+                                    playMetalBrickSound();
+                                } else {
+                                    // Reduce durability
+                                    brick.durability--;
+                                    
+                                    // Award points based on durability (multi-hit bricks worth more)
+                                    const baseScore = 10;
+                                    const durabilityBonus = (brick.maxDurability - 1) * 5;
+                                    score += baseScore + durabilityBonus;
+                                    
+                                    // Destroy brick if durability reaches 0
+                                    if (brick.durability <= 0) {
+                                        brick.status = 0;
+                                        
+                                        // Powerup drop (15% chance, more likely from durable bricks)
+                                        const dropChance = POWERUP_DROP_CHANCE + (brick.maxDurability - 1) * 0.05;
+                                        if (Math.random() < dropChance) {
+                                            powerups.push({
+                                                x: brick.x + BRICK_WIDTH / 2 - 15,
+                                                y: brick.y + BRICK_HEIGHT,
+                                                speedY: 2,
+                                                type: selectPowerup()
+                                            });
+                                        }
+                                    }
+                                    
+                                    ball.speedY = -ball.speedY;
+                                    playBallBrickSound();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Ball lost
+                if (ball.y - ball.radius > gameCanvas.height) {
+                    balls.splice(ballIdx, 1);
+                }
+            }
+
+            // If all balls lost, lose a life
+            if (balls.length === 0) {
+                lives--;
+                showingFlash = true;
+                lastLifeLossTime = Date.now();
+                playLifeLossSound();
+                setTimeout(() => { showingFlash = false; }, 200);
+                
+                if (lives <= 0) {
+                    endGame();
+                    return;
+                }
+                balls = [createBall(gameCanvas.width / 2, gameCanvas.height - 60, 4, -4)];
+            }
+
+            // Update powerups
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                let p = powerups[i];
+                p.y += p.speedY;
+
+                // Powerup collision with paddle
+                if (p.y + 30 > paddle.y &&
+                    p.y < paddle.y + paddle.height &&
+                    p.x + 30 > paddle.x &&
+                    p.x < paddle.x + paddle.width) {
+                    
+                    switch(p.type) {
+                        case 'life':
+                            lives++;
+                            powerupFlashText = '+1 Life';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'ball':
+                            balls.push(createBall(
+                                paddle.x + paddle.width / 2,
+                                paddle.y - 30,
+                                (Math.random() - 0.5) * 5,
+                                -4
+                            ));
+                            powerupFlashText = '+1 Ball';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'balls2':
+                            for (let j = 0; j < 2; j++) {
+                                balls.push(createBall(
+                                    paddle.x + paddle.width / 2 + (Math.random() - 0.5) * 40,
+                                    paddle.y - 30,
+                                    (Math.random() - 0.5) * 5,
+                                    -4
+                                ));
+                            }
+                            powerupFlashText = '+2 Balls';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'multi':
+                            for (let j = 0; j < 3; j++) {
+                                balls.push(createBall(
+                                    paddle.x + paddle.width / 2 + (Math.random() - 0.5) * 60,
+                                    paddle.y - 30,
+                                    (Math.random() - 0.5) * 5,
+                                    -4
+                                ));
+                            }
+                            powerupFlashText = 'Multi Ball!';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'mega':
+                            for (let j = 0; j < 10; j++) {
+                                balls.push(createBall(
+                                    paddle.x + paddle.width / 2 + (Math.random() - 0.5) * 100,
+                                    paddle.y - 30,
+                                    (Math.random() - 0.5) * 6,
+                                    -5
+                                ));
+                            }
+                            powerupFlashText = '🌟 MEGA BALL! 🌟';
+                            powerupFlashEndTime = Date.now() + 600;
+                            break;
+                        case 'long':
+                            paddle.width = Math.min(paddle.baseWidth * 1.66, paddle.width * 1.33);
+                            powerupFlashText = 'Long Paddle';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'short':
+                            paddle.width = Math.max(paddle.baseWidth * 0.5, paddle.width * 0.67);
+                            powerupFlashText = 'Short Paddle';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'slow':
+                            for (let ball of balls) {
+                                ball.speedX *= 0.7;
+                                ball.speedY *= 0.7;
+                            }
+                            powerupFlashText = 'Slow Mode';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'fast':
+                            for (let ball of balls) {
+                                ball.speedX *= 1.4;
+                                ball.speedY *= 1.4;
+                            }
+                            powerupFlashText = '⚡ SPEED UP! ⚡';
+                            powerupFlashEndTime = Date.now() + 400;
+                            break;
+                        case 'bonus':
+                            lives += 3;
+                            powerupFlashText = '💫 +3 LIVES! 💫';
+                            powerupFlashEndTime = Date.now() + 600;
+                            break;
+                    }
+                    playPowerupSound();
+                    powerups.splice(i, 1);
+                } else if (p.y > gameCanvas.height) {
+                    powerups.splice(i, 1);
+                }
+            }
+
+            // Check if level complete - only count destructible bricks
+            let destructibleBricksLeft = 0;
+            for (let c = 0; c < BRICK_COLUMN_COUNT; c++) {
+                for (let r = 0; r < BRICK_ROW_COUNT; r++) {
+                    if (bricks[c][r].status === 1 && !bricks[c][r].isMetal) destructibleBricksLeft++;
+                }
+            }
+            if (destructibleBricksLeft === 0) {
+                level++;
+                score += 100;
+                initializeGame();
+            }
+        }
+
+        function endGame() {
+            gameRunning = false;
+            gameActive = false;
+            gameInitialized = false;
+            stopBackgroundMusic(); // Stop background music when game ends
+            gameCanvas.style.display = 'none';
+            document.getElementById('logo').style.display = 'block';
+            document.querySelector('.header-nav').style.display = 'flex';
+            document.querySelector('.mask-zone').style.display = 'block';
+            isHoldingLogo = false;
+            lives = 3;
+            score = 0;
+            level = 1;
+            const logo = document.getElementById('logo');
+            if (logo) logo.classList.remove('holding');
+        }
+
+        function gameLoop() {
+            if (gameRunning) {
+                updateGame();
+                drawGame();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // Logo hold detection for easter egg
+        let logo = document.getElementById('logo');
+        let holdInterval = null;
+
+        logo.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            if (!gameInitialized && !gameActive) {
+                isHoldingLogo = true;
+                holdStartTime = Date.now();
+                logo.classList.add('holding');
+
+                holdInterval = setInterval(() => {
+                    if (isHoldingLogo && holdStartTime) {
+                        const elapsed = Date.now() - holdStartTime;
+                        if (elapsed >= holdDuration && !gameActive) {
+                            gameActive = true;
+                            gameCanvas.style.display = 'block';
+                            document.getElementById('logo').style.display = 'none';
+                            document.querySelector('.header-nav').style.display = 'none';
+                            document.querySelector('.mask-zone').style.display = 'none';
+                            initializeGame();
+                            gameLoop();
+                            clearInterval(holdInterval);
+                        }
+                    }
+                }, 100);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isHoldingLogo && !gameInitialized) {
+                isHoldingLogo = false;
+                logo.classList.remove('holding');
+                if (holdInterval) clearInterval(holdInterval);
+            } else if (gameActive && gameInitialized) {
+                endGame();
+            }
+        });
+
+        logo.addEventListener('mouseleave', () => {
+            if (isHoldingLogo && !gameInitialized) {
+                isHoldingLogo = false;
+                logo.classList.remove('holding');
+                if (holdInterval) clearInterval(holdInterval);
+            }
+        });
+
+        // Touch support for mobile
+        logo.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameInitialized && !gameActive) {
+                isHoldingLogo = true;
+                holdStartTime = Date.now();
+                logo.classList.add('holding');
+
+                holdInterval = setInterval(() => {
+                    if (isHoldingLogo && holdStartTime) {
+                        const elapsed = Date.now() - holdStartTime;
+                        if (elapsed >= holdDuration && !gameActive) {
+                            gameActive = true;
+                            gameCanvas.style.display = 'block';
+                            document.getElementById('logo').style.display = 'none';
+                            document.querySelector('.header-nav').style.display = 'none';
+                            document.querySelector('.mask-zone').style.display = 'none';
+                            initializeGame();
+                            gameLoop();
+                            clearInterval(holdInterval);
+                        }
+                    }
+                }, 100);
+            }
+        });
+
+        logo.addEventListener('touchend', () => {
+            if (isHoldingLogo && !gameInitialized) {
+                isHoldingLogo = false;
+                logo.classList.remove('holding');
+                if (holdInterval) clearInterval(holdInterval);
+            } else if (gameActive && gameInitialized) {
+                endGame();
+            }
+        });
+
+        // Paddle follows mouse on desktop
+        document.addEventListener('mousemove', (e) => {
+            if (gameActive && gameInitialized) {
+                mousePosX = e.clientX;
+            }
+        });
+
+        // Paddle follows touch on mobile
+        document.addEventListener('touchmove', (e) => {
+            if (gameActive && gameInitialized && e.touches.length > 0) {
+                mousePosX = e.touches[0].clientX;
+            }
+        }, false);
+
+        // ========== EASTER EGG 2: PROFESSIONAL BLACKJACK GAME ==========
+        let blackjackActive = false;
+        let isHoldingCopyright = false;
+        let copyHoldInterval = null;
+        const copyright = document.querySelector('.copyright');
+
+        // Card Suit Symbols (only in JS, never in DOM)
+        const SUITS = ['♠', '♥', '♦', '♣'];
+        const SUIT_COLORS = ['black', 'red', 'red', 'black'];
+
+        // Blackjack Game Object
+        const blackjack = {
+            balance: 10000,
+            deck: [],
+            deckIndex: 0,
+            dealerHand: [],
+            dealerCardValues: [], // Store actual values, never display in HTML
+            dealerShowing: false,
+            hands: [],
+            currentHandIndex: -1,
+            gameState: 'idle', // idle, betting, playing, settling
+            lastBets: [0, 0, 0],
+            originalBets: [0, 0, 0], // Store original bets before doubledown
+            rebetMode: false, // Toggle for auto rebet
+            
+            initDeck: function() {
+                this.deck = [];
+                // 8 decks of 52 cards
+                for (let d = 0; d < 8; d++) {
+                    for (let rank = 1; rank <= 13; rank++) {
+                        this.deck.push(rank);
+                    }
+                }
+                // Fisher-Yates shuffle
+                for (let i = this.deck.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [this.deck[i], this.deck[j]] = [this.deck[j], this.deck[i]];
+                }
+                this.deckIndex = 0;
+                this.reshufflePoint = Math.floor(this.deck.length * 0.75);
+            },
+            
+            drawCard: function() {
+                if (this.deckIndex >= this.reshufflePoint) {
+                    this.initDeck();
+                }
+                return this.deck[this.deckIndex++];
+            },
+            
+            getCardValue: function(rank) {
+                if (rank === 1) return 11; // Ace = 11 initially
+                if (rank > 10) return 10; // Face cards = 10
+                return rank;
+            },
+            
+            getHandValue: function(cards) {
+                let value = 0;
+                let aces = 0;
+                
+                for (let card of cards) {
+                    const cardVal = this.getCardValue(card);
+                    if (card === 1) aces++;
+                    value += cardVal;
+                }
+                
+                // Adjust for aces - convert from 11 to 1 as needed
+                while (value > 21 && aces > 0) {
+                    value -= 10;
+                    aces--;
+                }
+                
+                return value;
+            },
+            
+            getHandValues: function(cards) {
+                if (cards.length === 0) return ['0'];
+                
+                let value = 0;
+                let aces = 0;
+                
+                for (let card of cards) {
+                    const cardVal = this.getCardValue(card);
+                    if (card === 1) aces++;
+                    value += cardVal;
+                }
+                
+                if (aces === 0) {
+                    return [value.toString()];
+                }
+                
+                // Has aces - calculate soft and hard values
+                let softValue = value;
+                let hardValue = value;
+                
+                // Adjust soft value: one ace counts as 11, rest as 1
+                let acesCount = aces;
+                while (softValue > 21 && acesCount > 0) {
+                    softValue -= 10;
+                    acesCount--;
+                }
+                
+                // Hard value: all aces count as 1
+                hardValue = 0;
+                for (let card of cards) {
+                    if (card === 1) {
+                        hardValue += 1;
+                    } else {
+                        hardValue += this.getCardValue(card);
+                    }
+                }
+                
+                // Show both if they differ
+                if (softValue !== hardValue) {
+                    return [hardValue.toString(), softValue.toString()];
+                }
+                
+                return [softValue.toString()];
+            },
+            
+            canSplit: function(handIndex) {
+                const hand = this.hands[handIndex];
+                if (hand.cards.length !== 2) return false;
+                // Prevent splitting if already a split
+                if (hand.split) return false;
+                const v1 = this.getCardValue(hand.cards[0]);
+                const v2 = this.getCardValue(hand.cards[1]);
+                return v1 === v2 && this.balance >= hand.bet;
+            },
+            
+            split: function(handIndex) {
+                const hand = this.hands[handIndex];
+                if (!this.canSplit(handIndex) || hand.cards.length !== 2) return false;
+                
+                const splitCard = hand.cards.pop();
+                hand.cards.push(this.drawCard());
+                
+                const newHand = {
+                    cards: [splitCard],
+                    bet: hand.bet,
+                    active: true,
+                    result: null,
+                    status: 'playing',
+                    sideBet: 0,
+                    split: true,
+                    parentIndex: handIndex // Track parent hand
+                };
+                
+                newHand.cards.push(this.drawCard());
+                this.balance -= hand.bet;
+                
+                // Don't insert elsewhere - keep track of split hands
+                if (!hand.splitHands) {
+                    hand.splitHands = [];
+                }
+                hand.splitHands.push(newHand);
+                hand.currentSplitIndex = 0;
+                hand.status = 'playing';
+                
+                return true;
+            },
+            
+            hit: function(handIndex) {
+                const newCard = this.drawCard();
+                this.hands[handIndex].cards.push(newCard);
+                const value = this.getHandValue(this.hands[handIndex].cards);
+                if (value > 21) {
+                    this.hands[handIndex].status = 'bust';
+                    this.nextHand();
+                }
+                renderBlackjack();
+            },
+            
+            stand: function(handIndex) {
+                this.hands[handIndex].status = 'stand';
+                this.nextHand();
+                renderBlackjack();
+            },
+            
+            doubleDown: function(handIndex) {
+                const hand = this.hands[handIndex];
+                if (hand.cards.length !== 2 || this.balance < hand.bet) return false;
+                
+                this.balance -= hand.bet;
+                hand.bet *= 2;
+                hand.cards.push(this.drawCard());
+                
+                const value = this.getHandValue(hand.cards);
+                if (value > 21) {
+                    hand.status = 'bust';
+                }
+                hand.status = 'stand'; // Auto stand after double down
+                
+                this.nextHand();
+                renderBlackjack();
+                return true;
+            },
+            
+            nextHand: function() {
+                this.currentHandIndex++;
+                // Skip inactive hands
+                while (this.currentHandIndex < this.hands.length && !this.hands[this.currentHandIndex].active) {
+                    this.currentHandIndex++;
+                }
+                
+                if (this.currentHandIndex >= this.hands.length) {
+                    this.revealDealerCard();
+                    this.dealerPlay();
+                }
+            },
+            
+            nextSplitHand: function(mainHandIndex) {
+                const hand = this.hands[mainHandIndex];
+                if (!hand.splitHands || hand.splitHands.length === 0) return;
+                
+                hand.currentSplitIndex++;
+                
+                if (hand.currentSplitIndex >= hand.splitHands.length) {
+                    // All split hands done, move to next main hand
+                    hand.status = 'stand';
+                    this.nextHand();
+                } else {
+                    // More split hands to play - stay on this hand
+                }
+            },
+            
+            revealDealerCard: function() {
+                // Show the dealer's hidden card
+                if (this.dealerHand.length > 0) {
+                    // Already revealed in rendering after dealer plays
+                }
+            },
+            
+            dealerPlay: function() {
+                this.dealerShowing = true;
+                while (this.getHandValue(this.dealerCardValues) < 17) {
+                    const newCard = this.drawCard();
+                    this.dealerHand.push(newCard);
+                    this.dealerCardValues.push(newCard);
+                }
+                this.settle();
+            },
+            
+            settle: function() {
+                const dealerValue = this.getHandValue(this.dealerCardValues);
+                const dealerBust = dealerValue > 21;
+                const dealerBlackjack = this.dealerCardValues.length === 2 && dealerValue === 21;
+                
+                // Settle main hands
+                for (let i = 0; i < this.hands.length; i++) {
+                    const hand = this.hands[i];
+                    if (!hand.active || hand.bet === 0) continue;
+                    
+                    // Settle split hands first
+                    if (hand.splitHands && hand.splitHands.length > 0) {
+                        for (let split of hand.splitHands) {
+                            this.settleHand(split, dealerValue, dealerBust, dealerBlackjack);
+                        }
+                    }
+                    
+                    // Settle main hand
+                    this.settleHand(hand, dealerValue, dealerBust, dealerBlackjack);
+                    // Store original bet (before any doubledown) for rebet purposes
+                    this.lastBets[i] = this.originalBets[i] || hand.bet;
+                }
+                
+                this.gameState = 'settling';
+                saveBalance();
+                renderBlackjack();
+            },
+            
+            settleHand: function(hand, dealerValue, dealerBust, dealerBlackjack) {
+                const playerValue = this.getHandValue(hand.cards);
+                const playerBlackjack = hand.cards.length === 2 && playerValue === 21;
+                
+                // Check natural blackjack
+                if (dealerBlackjack && !playerBlackjack) {
+                    hand.result = 'LOSE ✗';
+                } else if (playerBlackjack && !dealerBlackjack) {
+                    hand.result = '⭐ BJ! ⭐';
+                    this.balance += Math.floor(hand.bet * 2.5);
+                } else if (playerBlackjack && dealerBlackjack) {
+                    hand.result = 'PUSH';
+                    this.balance += hand.bet;
+                } else if (playerValue > 21) {
+                    hand.result = 'BUST ✗';
+                } else if (dealerBust) {
+                    hand.result = 'WIN ✓';
+                    this.balance += hand.bet * 2;
+                } else if (playerValue > dealerValue) {
+                    hand.result = 'WIN ✓';
+                    this.balance += hand.bet * 2;
+                } else if (playerValue < dealerValue) {
+                    hand.result = 'LOSE ✗';
+                } else {
+                    hand.result = 'PUSH';
+                    this.balance += hand.bet;
+                }
+            },
+            
+            resetHands: function() {
+                this.hands = [
+                    { cards: [], bet: 0, active: false, result: null, status: 'idle', sideBet: 0, split: false, splitHands: [], currentSplitIndex: -1 },
+                    { cards: [], bet: 0, active: true, result: null, status: 'idle', sideBet: 0, split: false, splitHands: [], currentSplitIndex: -1 },
+                    { cards: [], bet: 0, active: false, result: null, status: 'idle', sideBet: 0, split: false, splitHands: [], currentSplitIndex: -1 }
+                ];
+                this.dealerHand = [];
+                this.dealerCardValues = [];
+                this.dealerShowing = false;
+                this.currentHandIndex = -1;
+            }
+        };
+
+        function createCardElement(rank) {
+            const rankMap = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K' };
+            const rankStr = rankMap[rank] || rank.toString();
+            
+            // Use deterministic suit based on rank to keep cards consistent across renders
+            const suitIndex = (rank * 7) % 4;
+            const suit = SUITS[suitIndex];
+            const color = SUIT_COLORS[suitIndex];
+            
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `bj-card ${color}`;
+            cardDiv.innerHTML = `
+                <div class="bj-card-rank">${rankStr}${suit}</div>
+                <div style="font-size: 24px;">${suit}</div>
+                <div class="bj-card-rank-bottom">${rankStr}${suit}</div>
+            `;
+            return cardDiv;
+        }
+
+        function createCardBack() {
+            const backDiv = document.createElement('div');
+            backDiv.className = 'bj-card-back';
+            backDiv.textContent = '♠';
+            return backDiv;
+        }
+
+        function renderHandsDisplay() {
+            const grid = document.getElementById('handsGrid');
+            grid.innerHTML = '';
+            
+            const colors = ['#00bcd4', '#ffd700', '#e91e63'];
+            const labels = ['HAND 1 - LEFT', 'PRIMARY HAND', 'HAND 3 - RIGHT'];
+            
+            for (let i = 0; i < 3; i++) {
+                const hand = blackjack.hands[i];
+                if (!hand.active) continue;
+                
+                // Single container for main hand + all splits
+                const mainContainer = document.createElement('div');
+                mainContainer.style.cssText = `padding: 20px; background: linear-gradient(135deg, rgba(0,0,0,0.4), rgba(15,31,31,0.4)); border-radius: 12px; border: 3px solid ${colors[i]};`;
+                
+                // Render main hand
+                const mainHandHTML = renderSingleHand(hand, i, colors[i], labels[i], false);
+                mainContainer.innerHTML = mainHandHTML;
+                grid.appendChild(mainContainer);
+                
+                // Render split hands within same container
+                if (hand.splitHands && hand.splitHands.length > 0) {
+                    for (let s = 0; s < hand.splitHands.length; s++) {
+                        const splitHand = hand.splitHands[s];
+                        const splitLabel = `${labels[i]} - SPLIT #${s + 1}`;
+                        const splitHTML = renderSingleHand(splitHand, `${i}-${s}`, colors[i], splitLabel, true);
+                        
+                        const splitDiv = document.createElement('div');
+                        splitDiv.style.cssText = `margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; border-left: 3px solid ${colors[i]};`;
+                        splitDiv.innerHTML = splitHTML;
+                        mainContainer.appendChild(splitDiv);
+                    }
+                }
+            }
+        }
+        
+        function renderSingleHand(hand, handKey, color, label, isSplit) {
+            let headerHTML = `<div style="color: ${color}; font-size: 14px; font-weight: bold; letter-spacing: 1px; margin-bottom: 12px;">
+                ${label}`;
+            
+            if (hand.result) {
+                headerHTML += ` - ${hand.result}`;
+            }
+            headerHTML += `</div>`;
+            
+            // Bet amount display
+            const betHTML = hand.bet > 0 ? `<div style="color: ${color}; font-size: 12px; font-weight: bold; margin-bottom: 8px;">Bet: $${hand.bet}</div>` : '';
+            
+            // Cards display
+            let cardsHTML = '<div style="display: flex; gap: 12px; min-height: 115px; align-items: center; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-bottom: 12px; justify-content: center; flex-wrap: wrap;">';
+            for (let card of hand.cards) {
+                const rankMap = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K' };
+                const rankStr = rankMap[card] || card.toString();
+                const suitIndex = (card * 7) % 4;
+                const suit = SUITS[suitIndex];
+                const suitColor = SUIT_COLORS[suitIndex];
+                
+                cardsHTML += `<div class="bj-card ${suitColor}" style="width: 70px; height: 105px; background: white; border: 2px solid #333; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; font-size: 32px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); position: relative;">
+                    <div style="position: absolute; top: 4px; left: 4px; font-size: 12px; line-height: 1;">${rankStr}${suit}</div>
+                    <div style="font-size: 24px;">${suit}</div>
+                    <div style="position: absolute; bottom: 4px; right: 4px; font-size: 12px; line-height: 1; transform: rotate(180deg);">${rankStr}${suit}</div>
+                </div>`;
+            }
+            cardsHTML += '</div>';
+            
+            // Value display
+            const values = blackjack.getHandValues(hand.cards);
+            let valueStr = '';
+            if (values.length === 2) {
+                valueStr = `${values[0]}/${values[1]}`;
+            } else {
+                valueStr = values[0];
+            }
+            
+            if (hand.status === 'bust') {
+                valueStr = `BUST (${valueStr})`;
+            }
+            
+            const valueHTML = `<div style="color: ${color}; font-size: 14px; text-align: center; margin-bottom: 12px; font-weight: bold;">Value: ${valueStr}</div>`;
+            
+            // Win/Loss amount display
+            let winLossHTML = '';
+            if (hand.result) {
+                let amount = 0;
+                if (hand.result.includes('WIN')) {
+                    amount = hand.bet * 2;
+                    winLossHTML = `<div style="color: #4CAF50; font-size: 12px; font-weight: bold; margin-bottom: 8px;">+$${amount}</div>`;
+                } else if (hand.result.includes('BJ')) {
+                    amount = Math.floor(hand.bet * 2.5);
+                    winLossHTML = `<div style="color: #4CAF50; font-size: 12px; font-weight: bold; margin-bottom: 8px;">+$${amount}</div>`;
+                } else if (hand.result.includes('PUSH')) {
+                    winLossHTML = `<div style="color: #FFC107; font-size: 12px; font-weight: bold; margin-bottom: 8px;">Push (Return Bet)</div>`;
+                } else if (hand.result.includes('LOSE') || hand.result.includes('BUST')) {
+                    winLossHTML = `<div style="color: #d32f2f; font-size: 12px; font-weight: bold; margin-bottom: 8px;">-$${hand.bet}</div>`;
+                }
+            }
+            
+            // Actions
+            let actionsHTML = '';
+            
+            // Determine if this is the currently playable hand
+            let isCurrentHand = false;
+            if (blackjack.gameState === 'playing' && hand.bet > 0 && hand.status === 'playing') {
+                if (!isSplit) {
+                    // For main hands, check if it's active and at current hand index
+                    isCurrentHand = hand.active && handKey == blackjack.currentHandIndex;
+                } else {
+                    // For split hands, check parent hand and current split index
+                    const mainIdx = parseInt(handKey.split('-')[0]);
+                    const splitIdx = parseInt(handKey.split('-')[1]);
+                    const parentHand = blackjack.hands[mainIdx];
+                    isCurrentHand = parentHand.currentSplitIndex === splitIdx;
+                }
+            }
+            
+            if (isCurrentHand) {
+                // Check if hand has 21 - auto stand if true
+                const handValue = blackjack.getHandValue(hand.cards);
+                if (handValue === 21) {
+                    // Auto-stand on 21 and play celebration chime
+                    play21Chime();
+                    if (!isSplit) {
+                        blackjack.hands[parseInt(handKey)].status = 'stand';
+                    } else {
+                        hand.status = 'stand';
+                    }
+                    blackjack.nextHand();
+                    renderBlackjack();
+                } else {
+                    actionsHTML = `
+                        <button onclick="hitHand('${handKey}')" style="background: ${color}; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">🎯 HIT</button>
+                        <button onclick="standHand('${handKey}')" style="background: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">✋ STAND</button>
+                    `;
+                    
+                    // Only show split on main hand with 2 cards
+                    if (!isSplit && hand.cards.length === 2 && blackjack.canSplit(parseInt(handKey))) {
+                        actionsHTML += `<button onclick="splitHand(${handKey})" style="background: #FF9800; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">✂️ SPLIT</button>`;
+                    }
+                    
+                    // Double down on initial 2 cards only
+                    if (hand.cards.length === 2 && blackjack.balance >= hand.bet) {
+                        actionsHTML += `<button onclick="doubleDown('${handKey}')" style="background: #9C27B0; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">💰 DOUBLE</button>`;
+                    }
+                }
+            }
+            
+            return headerHTML + betHTML + cardsHTML + valueHTML + winLossHTML + `<div style="display: flex; gap: 8px; flex-wrap: wrap;">${actionsHTML}</div>`;
+        }
+
+        function renderBlackjack() {
+            // Update balance
+            document.getElementById('balanceDisplay').textContent = blackjack.balance.toLocaleString();
+            
+            // Render dealer
+            const dealerContainer = document.getElementById('dealerHand');
+            dealerContainer.innerHTML = '';
+            
+            if (blackjack.dealerCardValues.length > 0) {
+                dealerContainer.appendChild(createCardElement(blackjack.dealerCardValues[0]));
+                
+                if (blackjack.dealerCardValues.length > 1) {
+                    if (blackjack.dealerShowing) {
+                        // Show all cards during settling
+                        for (let i = 1; i < blackjack.dealerCardValues.length; i++) {
+                            dealerContainer.appendChild(createCardElement(blackjack.dealerCardValues[i]));
+                        }
+                    } else {
+                        // Hide second card during play
+                        dealerContainer.appendChild(createCardBack());
+                    }
+                }
+            }
+            
+            // Update dealer value
+            if (blackjack.dealerShowing && blackjack.dealerCardValues.length > 0) {
+                const dealerValue = blackjack.getHandValue(blackjack.dealerCardValues);
+                document.getElementById('dealerValue').textContent = `Value: ${dealerValue}`;
+            } else {
+                document.getElementById('dealerValue').textContent = '';
+            }
+            
+            // Render player hands
+            renderHandsDisplay();
+            
+            // Render main actions
+            renderMainActions();
+        }
+
+        function renderMainActions() {
+            const container = document.getElementById('gameActions');
+            container.innerHTML = '';
+            
+            if (blackjack.gameState === 'settling') {
+                const newHandBtn = document.createElement('button');
+                newHandBtn.textContent = '🔄 NEW HAND';
+                newHandBtn.style.cssText = 'background: linear-gradient(135deg, #2d9d6a, #1b6e52); color: white; border: none; padding: 14px 35px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 0 20px rgba(45,157,106,0.5); transition: all 0.3s;';
+                newHandBtn.onmouseover = () => newHandBtn.style.transform = 'scale(1.05)';
+                newHandBtn.onmouseout = () => newHandBtn.style.transform = 'scale(1)';
+                newHandBtn.onclick = () => newHandClick();
+                container.appendChild(newHandBtn);
+            }
+        }
+
+        function newHandClick() {
+            // Store current bet values before reset
+            const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+            const currentBets = [0, 0, 0];
+            for (let i = 0; i < 3; i++) {
+                const input = document.getElementById(inputs[i]);
+                if (input) {
+                    currentBets[i] = parseInt(input.value) || 0;
+                }
+            }
+            
+            // Store which hands were open before reset
+            const wereOpen = [blackjack.hands[0].active, blackjack.hands[1].active, blackjack.hands[2].active];
+            
+            blackjack.dealerHand = [];
+            blackjack.dealerCardValues = [];
+            blackjack.dealerShowing = false;
+            
+            for (let i = 0; i < 3; i++) {
+                blackjack.hands[i].cards = [];
+                blackjack.hands[i].result = null;
+                blackjack.hands[i].status = 'idle';
+                blackjack.hands[i].bet = 0;
+                blackjack.hands[i].split = false;
+                blackjack.hands[i].splitHands = [];
+                blackjack.hands[i].currentSplitIndex = -1;
+            }
+            
+            // Restore hand open status from before game - ensure primary is always active
+            blackjack.hands[0].active = wereOpen[0];
+            blackjack.hands[1].active = wereOpen[1] || true; // Primary always shows
+            blackjack.hands[2].active = wereOpen[2];
+            
+            blackjack.gameState = 'idle';
+            blackjack.currentHandIndex = -1;
+            
+            // Determine if add button should be visible
+            const activeCount = (wereOpen[0] ? 1 : 0) + (wereOpen[1] ? 1 : 0) + (wereOpen[2] ? 1 : 0);
+            const addHandBtn = document.getElementById('addHandBtn');
+            if (addHandBtn) {
+                addHandBtn.style.display = activeCount >= 3 ? 'none' : 'block';
+            }
+            
+            document.getElementById('bettingSection').style.display = 'block';
+            renderBettingSection();
+            
+            // Restore bet values after re-rendering
+            setTimeout(() => {
+                for (let i = 0; i < 3; i++) {
+                    if (currentBets[i] > 0) {
+                        const input = document.getElementById(inputs[i]);
+                        if (input) {
+                            input.value = currentBets[i];
+                        }
+                    }
+                }
+                
+                // Apply auto rebet if toggle is enabled
+                if (document.getElementById('rebetToggle') && document.getElementById('rebetToggle').checked) {
+                    for (let i = 0; i < 3; i++) {
+                        if (blackjack.hands[i].active && blackjack.lastBets[i] > 0) {
+                            const input = document.getElementById(inputs[i]);
+                            if (input && !input.value) {
+                                input.value = blackjack.lastBets[i];
+                            }
+                        }
+                    }
+                } else {
+                    // If auto rebet is OFF, clear any lastBet values from inputs
+                    for (let i = 0; i < 3; i++) {
+                        const input = document.getElementById(inputs[i]);
+                        if (input && !currentBets[i] && blackjack.lastBets[i] > 0) {
+                            input.value = '';
+                        }
+                    }
+                }
+            }, 0);
+            
+            renderBlackjack();
+        }
+
+        function renderBettingSection() {
+            const controls = document.getElementById('bettingControls');
+            controls.innerHTML = '';
+            
+            const colors = ['#00bcd4', '#ffd700', '#e91e63'];
+            const labels = ['HAND 1', 'PRIMARY HAND', 'HAND 3'];
+            const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+            
+            for (let i = 0; i < 3; i++) {
+                if (!blackjack.hands[i].active) continue;
+                
+                const div = document.createElement('div');
+                div.style.cssText = `color: ${colors[i]}; font-size: 13px; position: relative; padding: 15px;`;
+                
+                const lastBet = blackjack.lastBets[i] || 0;
+                
+                let headerHTML = `<div style="font-weight: bold; margin-bottom: 10px;">${labels[i]} BET`;
+                if (i === 2 || i === 0) {
+                    headerHTML += `<button onclick="removeHand(${i})" style="background: #d32f2f; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 12px; position: absolute; right: 15px; top: 15px;">✕</button>`;
+                }
+                headerHTML += `</div>`;
+                
+                div.innerHTML = headerHTML;
+                
+                const inputDiv = document.createElement('div');
+                const inputWrapper = document.createElement('div');
+                inputWrapper.style.cssText = 'position: relative; display: flex; align-items: center;';
+                
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = inputs[i];
+                input.placeholder = '0';
+                input.min = '1';
+                input.style.cssText = `width: 100%; padding: 10px 35px 10px 10px; background: rgba(${colors[i] === '#00bcd4' ? '0,188,212' : colors[i] === '#ffd700' ? '255,215,0' : '233,30,99'},0.1); color: ${colors[i]}; border: 2px solid ${colors[i]}; border-radius: 6px; font-size: 14px; font-weight: bold; box-sizing: border-box;`
+                // Hide spinner buttons on number input
+                if (!document.querySelector('style[data-spinner-hidden]')) {
+                    const styleSheet = document.createElement('style');
+                    styleSheet.setAttribute('data-spinner-hidden', 'true');
+                    styleSheet.textContent = `
+                        input[type="number"]::-webkit-outer-spin-button,
+                        input[type="number"]::-webkit-inner-spin-button {
+                            -webkit-appearance: none;
+                            margin: 0;
+                        }
+                        input[type="number"] {
+                            -moz-appearance: textfield;
+                        }
+                    `;
+                    document.head.appendChild(styleSheet);
+                }
+                
+                inputWrapper.appendChild(input);
+                
+                inputDiv.appendChild(inputWrapper);
+                div.appendChild(inputDiv);
+                
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.style.cssText = 'display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px; margin-top: 8px;';
+                
+                const amounts = [10, 50, 100, 1000];
+                for (let amt of amounts) {
+                    const btn = document.createElement('button');
+                    btn.textContent = `$${amt}`;
+                    btn.onclick = () => setBet(i, amt);
+                    btn.style.cssText = `background: ${colors[i]}; color: ${i === 1 ? '#000' : 'white'}; border: none; padding: 8px; border-radius: 4px; font-weight: bold; cursor: pointer;`;
+                    buttonsDiv.appendChild(btn);
+                }
+                div.appendChild(buttonsDiv);
+                
+                controls.appendChild(div);
+            }
+        }
+
+        function setBet(handIndex, amount, isRebet = false) {
+            const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+            const input = document.getElementById(inputs[handIndex]);
+            if (isRebet) {
+                input.value = amount;
+            } else {
+                const current = parseInt(input.value) || 0;
+                input.value = current + amount;
+            }
+        }
+
+        function toggleAddHand() {
+            // Store current bet values before toggling
+            const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+            const currentBets = [0, 0, 0];
+            for (let i = 0; i < 3; i++) {
+                const input = document.getElementById(inputs[i]);
+                if (input) {
+                    currentBets[i] = parseInt(input.value) || 0;
+                }
+            }
+            
+            let activeCount = 0;
+            for (let i = 0; i < 3; i++) {
+                if (blackjack.hands[i].active) activeCount++;
+            }
+            
+            if (activeCount === 1) {
+                // Only primary - add hand 3
+                blackjack.hands[2].active = true;
+            } else if (activeCount === 2) {
+                // Primary + 3 - add hand 1
+                blackjack.hands[0].active = true;
+                document.getElementById('addHandBtn').style.display = 'none';
+            } else {
+                // All 3 active - go back to primary only
+                blackjack.hands[0].active = false;
+                blackjack.hands[2].active = false;
+                document.getElementById('addHandBtn').style.display = 'block';
+            }
+            
+            renderBettingSection();
+            
+            // Restore bet values after re-rendering
+            setTimeout(() => {
+                for (let i = 0; i < 3; i++) {
+                    const input = document.getElementById(inputs[i]);
+                    if (input && currentBets[i] > 0) {
+                        input.value = currentBets[i];
+                    }
+                }
+            }, 0);
+        }
+
+        function removeHand(handIndex) {
+            // Store current bet values before removing hand
+            const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+            const currentBets = [0, 0, 0];
+            for (let i = 0; i < 3; i++) {
+                const input = document.getElementById(inputs[i]);
+                if (input) {
+                    currentBets[i] = parseInt(input.value) || 0;
+                }
+            }
+            
+            blackjack.hands[handIndex].active = false;
+            blackjack.hands[handIndex].bet = 0;
+            blackjack.lastBets[handIndex] = 0;
+            
+            let activeCount = 0;
+            for (let i = 0; i < 3; i++) {
+                if (blackjack.hands[i].active) activeCount++;
+            }
+            
+            document.getElementById('addHandBtn').style.display = activeCount < 3 ? 'block' : 'none';
+            renderBettingSection();
+            
+            // Restore bet values for remaining hands after re-rendering
+            setTimeout(() => {
+                for (let i = 0; i < 3; i++) {
+                    if (i !== handIndex && currentBets[i] > 0) {
+                        const input = document.getElementById(inputs[i]);
+                        if (input) {
+                            input.value = currentBets[i];
+                        }
+                    }
+                }
+            }, 0);
+        }
+
+        function startGame() {
+            // Validate and collect bets
+            let totalBet = 0;
+            let activeBets = 0;
+            const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+            let errorMsg = '';
+            
+            // Clear all hands first
+            for (let i = 0; i < 3; i++) {
+                blackjack.hands[i].cards = [];
+                blackjack.hands[i].result = null;
+                blackjack.hands[i].status = 'idle';
+                blackjack.hands[i].splitHands = [];
+                blackjack.hands[i].currentSplitIndex = -1;
+                blackjack.originalBets[i] = 0; // Reset original bets
+            }
+            
+            for (let i = 0; i < 3; i++) {
+                if (!blackjack.hands[i].active) {
+                    blackjack.hands[i].bet = 0;
+                    continue;
+                }
+                
+                const input = document.getElementById(inputs[i]);
+                if (!input) {
+                    errorMsg = 'Betting input not found. Please refresh';
+                    showBetError(errorMsg);
+                    return;
+                }
+                
+                const betAmount = parseInt(input.value) || 0;
+                
+                if (betAmount <= 0) {
+                    errorMsg = `Hand ${i === 0 ? '1' : i === 1 ? '(Primary)' : '3'} requires a bet`;
+                    showBetError(errorMsg);
+                    return;
+                }
+                if (betAmount > blackjack.balance) {
+                    errorMsg = `Insufficient balance for Hand ${i === 0 ? '1' : i === 1 ? '(Primary)' : '3'}`;
+                    showBetError(errorMsg);
+                    return;
+                }
+                blackjack.hands[i].bet = betAmount;
+                totalBet += betAmount;
+                activeBets++;
+            }
+            
+            if (activeBets === 0) {
+                errorMsg = 'Place at least one bet';
+                showBetError(errorMsg);
+                return;
+            }
+            
+            // Deduct bets from balance
+            blackjack.balance -= totalBet;
+            
+            // Deal cards and store original bet amounts for rebet
+            playDealChime();
+            for (let i = 0; i < 3; i++) {
+                if (blackjack.hands[i].active && blackjack.hands[i].bet > 0) {
+                    blackjack.hands[i].cards = [blackjack.drawCard(), blackjack.drawCard()];
+                    blackjack.hands[i].status = 'playing';
+                    blackjack.hands[i].result = null;
+                    blackjack.originalBets[i] = blackjack.hands[i].bet; // Store original bet before any doubledown
+                }
+            }
+            
+            // Check for player blackjacks - auto stand
+            for (let i = 0; i < 3; i++) {
+                if (blackjack.hands[i].active && blackjack.hands[i].bet > 0) {
+                    const value = blackjack.getHandValue(blackjack.hands[i].cards);
+                    if (value === 21) {
+                        blackjack.hands[i].status = 'stand';
+                    }
+                }
+            }
+            
+            // Deal dealer cards - only store values internally
+            blackjack.dealerCardValues = [blackjack.drawCard(), blackjack.drawCard()];
+            blackjack.dealerHand = [true, false]; // true = show first, false = show back for second
+            blackjack.dealerShowing = false;
+            
+            blackjack.gameState = 'playing';
+            blackjack.currentHandIndex = 0;
+            
+            // Skip to first active hand
+            while (blackjack.currentHandIndex < 3 && !blackjack.hands[blackjack.currentHandIndex].active) {
+                blackjack.currentHandIndex++;
+            }
+            
+            // Hide betting section
+            document.getElementById('bettingSection').style.display = 'none';
+            
+            saveBalance();
+            renderBlackjack();
+        }
+        
+        function showBetError(msg) {
+            const errorDiv = document.getElementById('bettingSection');
+            let errorDisplay = document.getElementById('betErrorDisplay');
+            if (!errorDisplay) {
+                errorDisplay = document.createElement('div');
+                errorDisplay.id = 'betErrorDisplay';
+                errorDiv.insertBefore(errorDisplay, errorDiv.firstChild);
+            }
+            errorDisplay.textContent = msg;
+            errorDisplay.style.cssText = 'color: #d32f2f; font-size: 13px; font-weight: bold; margin-bottom: 15px; text-align: center; letter-spacing: 0.5px;';
+            setTimeout(() => {
+                if (errorDisplay) errorDisplay.textContent = '';
+            }, 4000);
+        }
+
+        function hitHand(handKey) {
+            // Parse hand key format: "i" or "i-s" for splits
+            playHitChime();
+            if (typeof handKey === 'string' && handKey.includes('-')) {
+                const [mainIdx, splitIdx] = handKey.split('-').map(Number);
+                const splitHand = blackjack.hands[mainIdx].splitHands[splitIdx];
+                const newCard = blackjack.drawCard();
+                splitHand.cards.push(newCard);
+                const value = blackjack.getHandValue(splitHand.cards);
+                if (value > 21) {
+                    splitHand.status = 'bust';
+                    // Always advance to next split hand
+                    blackjack.nextSplitHand(mainIdx);
+                }
+            } else {
+                const idx = typeof handKey === 'string' ? parseInt(handKey) : handKey;
+                blackjack.hit(idx);
+            }
+            renderBlackjack();
+        }
+
+        function standHand(handKey) {
+            // Parse hand key format: "i" or "i-s" for splits
+            playStandChime();
+            if (typeof handKey === 'string' && handKey.includes('-')) {
+                const [mainIdx, splitIdx] = handKey.split('-').map(Number);
+                const splitHand = blackjack.hands[mainIdx].splitHands[splitIdx];
+                splitHand.status = 'stand';
+                // Always advance to next split hand
+                blackjack.nextSplitHand(mainIdx);
+            } else {
+                const idx = typeof handKey === 'string' ? parseInt(handKey) : handKey;
+                blackjack.stand(idx);
+            }
+            renderBlackjack();
+        }
+
+        function doubleDown(handKey) {
+            // Parse hand key format: "i" or "i-s" for splits
+            playDoubleChime();
+            if (typeof handKey === 'string' && handKey.includes('-')) {
+                const [mainIdx, splitIdx] = handKey.split('-').map(Number);
+                const splitHand = blackjack.hands[mainIdx].splitHands[splitIdx];
+                if (splitHand.cards.length === 2 && blackjack.balance >= splitHand.bet) {
+                    blackjack.balance -= splitHand.bet;
+                    splitHand.bet *= 2;
+                    const newCard = blackjack.drawCard();
+                    splitHand.cards.push(newCard);
+                    const value = blackjack.getHandValue(splitHand.cards);
+                    if (value > 21) {
+                        splitHand.status = 'bust';
+                    } else {
+                        splitHand.status = 'stand';
+                    }
+                    // Always advance to next split hand
+                    blackjack.nextSplitHand(mainIdx);
+                }
+            } else {
+                const idx = typeof handKey === 'string' ? parseInt(handKey) : handKey;
+                blackjack.doubleDown(idx);
+            }
+            renderBlackjack();
+        }
+
+        function splitHand(handIndex) {
+            playSplitChime();
+            blackjack.split(handIndex);
+            renderBlackjack();
+        }
+
+        function saveBalance() {
+            localStorage.setItem('blackjackBalance', blackjack.balance.toString());
+        }
+
+        function loadBalance() {
+            const saved = localStorage.getItem('blackjackBalance');
+            if (saved) {
+                blackjack.balance = parseInt(saved);
+            }
+        }
+
+        function openBlackjack() {
+            // Play discovery chime
+            playDiscoveryChime();
+            
+            blackjackActive = true;
+            document.getElementById('blackjackGame').style.display = 'block';
+            document.getElementById('logo').style.display = 'none';
+            document.querySelector('.header-nav').style.display = 'none';
+            document.querySelector('.mask-zone').style.display = 'none';
+            
+            loadBalance();
+            blackjack.initDeck();
+            blackjack.resetHands();
+            
+            // Auto-show primary hand on game start
+            blackjack.hands[1].active = true;
+            blackjack.hands[0].active = false;
+            blackjack.hands[2].active = false;
+            
+            // Show betting section
+            document.getElementById('bettingSection').style.display = 'block';
+            renderBettingSection();
+            document.getElementById('gameActions').innerHTML = '';
+            
+            renderBlackjack();
+        }
+        
+        function playDealChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Deal chime: quick descending two notes
+                const notes = [523.25, 392.00]; // C5, G4
+                const duration = 0.12;
+                const gap = 0.03;
+                
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = notes[i];
+                    osc.type = 'sine';
+                    
+                    const startTime = now + (i * (duration + gap));
+                    gain.gain.setValueAtTime(0.2, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+        
+        function playHitChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Hit chime: single quick tone
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                
+                osc.frequency.value = 659.25; // E5
+                osc.type = 'sine';
+                
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } catch (e) {
+                // Silent fail
+            }
+        }
+        
+        function playStandChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Stand chime: two medium notes
+                const notes = [440, 523.25]; // A4, C5
+                const duration = 0.15;
+                const gap = 0.05;
+                
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = notes[i];
+                    osc.type = 'sine';
+                    
+                    const startTime = now + (i * (duration + gap));
+                    gain.gain.setValueAtTime(0.2, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+        
+        function playSplitChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Split chime: three ascending tones (bright and distinct)
+                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                const duration = 0.1;
+                const gap = 0.04;
+                
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = notes[i];
+                    osc.type = 'square';
+                    
+                    const startTime = now + (i * (duration + gap));
+                    gain.gain.setValueAtTime(0.15, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+        
+        function playDoubleChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Double down chime: two quick low notes
+                const notes = [329.63, 392.00]; // E4, G4
+                const duration = 0.12;
+                const gap = 0.03;
+                
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = notes[i];
+                    osc.type = 'sine';
+                    
+                    const startTime = now + (i * (duration + gap));
+                    gain.gain.setValueAtTime(0.2, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+        
+        function play21Chime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // 21 celebration chime: ascending arpeggio
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                const duration = 0.1;
+                const gap = 0.05;
+                
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = notes[i];
+                    osc.type = 'sine';
+                    
+                    const startTime = now + (i * (duration + gap));
+                    gain.gain.setValueAtTime(0.25, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function playDiscoveryChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+                
+                // Windows-like discovery chime: three ascending tones
+                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                const duration = 0.15;
+                const gap = 0.05;
+                
+                for (let i = 0; i < notes.length; i++) {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    
+                    osc.frequency.value = notes[i];
+                    osc.type = 'sine';
+                    
+                    const startTime = now + i * (duration + gap);
+                    gain.gain.setValueAtTime(0.3, startTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + duration);
+                }
+            } catch (e) {
+                // Silent fail
+            }
+        }
+
+        function closeBlackjack() {
+            blackjackActive = false;
+            document.getElementById('blackjackGame').style.display = 'none';
+            document.getElementById('logo').style.display = 'block';
+            document.querySelector('.header-nav').style.display = 'flex';
+            document.querySelector('.mask-zone').style.display = 'block';
+            saveBalance();
+        }
+        
+        function toggleRebetMode() {
+            const toggle = document.getElementById('rebetToggle');
+            blackjack.rebetMode = toggle ? toggle.checked : false;
+            
+            // If toggling on and we're in betting phase, auto-apply last bets
+            if (blackjack.rebetMode && blackjack.gameState === 'idle') {
+                const inputs = ['hand1BetInput', 'hand2BetInput', 'hand3BetInput'];
+                for (let i = 0; i < 3; i++) {
+                    if (blackjack.hands[i].active && blackjack.lastBets[i] > 0) {
+                        const input = document.getElementById(inputs[i]);
+                        if (input && !input.value) {
+                            input.value = blackjack.lastBets[i];
+                        }
+                    }
+                }
+            }
+        }
+
+        function prayForMoney() {
+            if (blackjack.balance <= 0) {
+                blackjack.balance += 1000;
+                saveBalance();
+                document.getElementById('balanceDisplay').textContent = blackjack.balance.toLocaleString();
+            }
+        }
+
+        // Copyright hold detection
+        if (copyright) {
+            copyright.style.cursor = 'default';
+            copyright.style.userSelect = 'none';
+            copyright.style.transition = 'all 0.3s ease';
+            
+            copyright.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                if (!blackjackActive) {
+                    isHoldingCopyright = true;
+                    const holdStartTime = Date.now();
+                    copyright.style.textShadow = '0 0 20px rgba(45,157,106,0.8)';
+                    
+                    copyHoldInterval = setInterval(() => {
+                        if (isHoldingCopyright) {
+                            const elapsed = Date.now() - holdStartTime;
+                            const progress = Math.min(elapsed / 15000, 1);
+                            copyright.style.opacity = (0.3 + progress * 0.7).toString();
+                            
+                            if (elapsed >= 15000) {
+                                openBlackjack();
+                                isHoldingCopyright = false;
+                                copyright.style.opacity = '0.3';
+                                copyright.style.textShadow = 'none';
+                                clearInterval(copyHoldInterval);
+                            }
+                        }
+                    }, 50);
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isHoldingCopyright) {
+                    isHoldingCopyright = false;
+                    copyright.style.opacity = '0.3';
+                    copyright.style.textShadow = 'none';
+                    if (copyHoldInterval) clearInterval(copyHoldInterval);
+                }
+            });
+            
+            copyright.addEventListener('mouseleave', () => {
+                if (isHoldingCopyright) {
+                    isHoldingCopyright = false;
+                    copyright.style.opacity = '0.3';
+                    copyright.style.textShadow = 'none';
+                    if (copyHoldInterval) clearInterval(copyHoldInterval);
+                }
+            });
+            
+            // Touch support
+            copyright.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!blackjackActive) {
+                    isHoldingCopyright = true;
+                    const holdStartTime = Date.now();
+                    copyright.style.textShadow = '0 0 20px rgba(45,157,106,0.8)';
+                    
+                    copyHoldInterval = setInterval(() => {
+                        if (isHoldingCopyright) {
+                            const elapsed = Date.now() - holdStartTime;
+                            const progress = Math.min(elapsed / 15000, 1);
+                            copyright.style.opacity = (0.3 + progress * 0.7).toString();
+                            
+                            if (elapsed >= 15000) {
+                                openBlackjack();
+                                isHoldingCopyright = false;
+                                copyright.style.opacity = '0.3';
+                                copyright.style.textShadow = 'none';
+                                clearInterval(copyHoldInterval);
+                            }
+                        }
+                    }, 50);
+                }
+            });
+            
+            document.addEventListener('touchend', () => {
+                if (isHoldingCopyright) {
+                    isHoldingCopyright = false;
+                    copyright.style.opacity = '0.3';
+                    copyright.style.textShadow = 'none';
+                    if (copyHoldInterval) clearInterval(copyHoldInterval);
+                }
+            });
+            
+            copyright.addEventListener('touchcancel', () => {
+                if (isHoldingCopyright) {
+                    isHoldingCopyright = false;
+                    copyright.style.opacity = '0.3';
+                    copyright.style.textShadow = 'none';
+                    if (copyHoldInterval) clearInterval(copyHoldInterval);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
